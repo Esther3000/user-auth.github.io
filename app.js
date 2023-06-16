@@ -7,7 +7,10 @@ const User = require("./db/userModel");
 const auth = require("./auth");
 
 // Execute database connection
-dbConnect(app.use((req, res, next) => {
+dbConnect();
+
+// Middleware
+app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Headers",
@@ -18,9 +21,7 @@ dbConnect(app.use((req, res, next) => {
     "GET, POST, PUT, DELETE, PATCH, OPTIONS"
   );
   next();
-}));
-
-// Middleware
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -62,31 +63,23 @@ app.post("/register", (request, response) => {
       });
     });
 });
-
-
 // login endpoint
 app.post("/login", (request, response) => {
   // check if email exists
   User.findOne({ email: request.body.email })
-
     // if email exists
     .then((user) => {
       // compare the password entered and the hashed password found
-      bcrypt
-        .compare(request.body.password, user.password)
-
+      bcrypt.compare(request.body.password, user.password)
         // if the passwords match
         .then((passwordCheck) => {
-
           // check if password matches
-          if(!passwordCheck) {
-            return response.status(400).send({
-              message: "Passwords do not match",
-              error,
+          if (!passwordCheck) {
+            return response.status(400).send({message: "Passwords do not match",
             });
           }
 
-          //   create JWT token
+          // create JWT token
           const token = jwt.sign(
             {
               userId: user._id,
@@ -96,7 +89,7 @@ app.post("/login", (request, response) => {
             { expiresIn: "24h" }
           );
 
-          //   return success response
+          // return success response
           response.status(200).send({
             message: "Login Successful",
             email: user.email,
