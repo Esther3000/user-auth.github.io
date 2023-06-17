@@ -19,6 +19,11 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (request, response, next) => {
+  response.json({ message: "Hey! This is your server response!" });
+  next();
+});
+
 // register endpoint
 app.post("/register", (request, response) => {
   // hash the password
